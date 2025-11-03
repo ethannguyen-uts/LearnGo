@@ -26,15 +26,14 @@ func createAdjecentList(edges [][]int) map[int][]int {
 	return r
 }
 
-func main() {
+func cCreateAdjacentListMain() {
 	edges := [][]int{
-		[]int{0, 1},
-		[]int{1, 2},
-		[]int{2, 3},
-		[]int{3, 0},
-		[]int{0, 2},
+		{0, 1},
+		{1, 2},
+		{2, 3},
+		{3, 0},
+		{0, 2},
 	}
 
 	fmt.Println(createAdjecentList(edges))
-
 }
