@@ -6,7 +6,6 @@ func graph_valid_tree(n int, edges [][]int) bool {
 	}
 
 	adjacentList := getAdjecentList(edges)
-
 	firstEdge := edges[0][0];
 	visited := map[int]bool{}
 
@@ -39,7 +38,8 @@ func getAdjecentList(edges [][]int) map[int][]int {
 	for _, edge := range edges {
 		firstVertex, secondVertex := edge[0], edge[1]
 		r[firstVertex] = append(r[firstVertex], secondVertex)
-		r[secondVertex] = append(r[secondVertex], firstVertex) } 
-		
-		return r
+		r[secondVertex] = append(r[secondVertex], firstVertex) 
+	} 
+	
+	return r
 }
