@@ -1,40 +1,66 @@
+// fib_stress.go
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/big"
+	"os"
+	"strconv"
+	"time"
+)
 
-func createAdjecentList(edges [][]int) map[int][]int {
-	r := make(map[int][]int)
-
-	for i := range edges {
-		first, second := edges[i][0], edges[i][1]
-		firstVertexNeigbours, ok := r[first]
-		if (ok) {
-			r[first] = append(firstVertexNeigbours, second)
-		} else {
-			r[first] = []int{second}
-		}
-
-		secondVertexNeigbours, ok := r[second]
-
-		if (ok) {
-			r[second] = append(secondVertexNeigbours, first)
-		} else {
-			r[second] = []int{first}
-		}
+// fibInefficient computes Fibonacci using naive recursion,
+// launching two goroutines for n-1 and n-2 on every call.
+// It also performs a small busy loop to increase CPU usage.
+// Returns *big.Int to avoid overflow for moderately large n.
+func fibInefficient(n int) *big.Int {
+	if n < 2 {
+		return big.NewInt(int64(n))
 	}
 
-	return r
+	// Channel to receive two results
+	ch := make(chan *big.Int, 2)
+
+	// Spawn goroutines for both halves (this explodes goroutine count)
+	go func() {
+		ch <- fibInefficient(n - 1)
+	}()
+	go func() {
+		ch <- fibInefficient(n - 2)
+	}()
+
+	// Receive results (order not important)
+	a := <-ch
+	b := <-ch
+
+	// Busy work to burn CPU (adjust the loop count to increase/decrease load)
+	// Keep this moderate so it stresses CPU rather than crashing the system.
+	for i := 0; i < 5_000_000; i++ {
+		_ = i * i
+	}
+
+	sum := new(big.Int).Add(a, b)
+	return sum
 }
 
 func main() {
-	edges := [][]int{
-		[]int{0, 1},
-		[]int{1, 2},
-		[]int{2, 3},
-		[]int{3, 0},
-		[]int{0, 2},
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: go run fib_stress.go <n>")
+		fmt.Println("Example: go run fib_stress.go 36")
+		return
 	}
 
-	fmt.Println(createAdjecentList(edges))
+	n, err := strconv.Atoi(os.Args[1])
+	if err != nil || n < 0 {
+		fmt.Println("Please provide a non-negative integer for n.")
+		return
+	}
 
+	fmt.Printf("Starting extremely inefficient Fibonacci for n=%d\n", n)
+	start := time.Now()
+	result := fibInefficient(n)
+	elapsed := time.Since(start)
+
+	fmt.Printf("Fib(%d) = %s\n", n, result.String())
+	fmt.Printf("Elapsed: %s\n", elapsed)
 }
