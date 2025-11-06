@@ -15,13 +15,13 @@ func cloneGraph(node *Node) *Node {
 	}
 
 	maps := make(map[int][]*Node)
-	buildNodes(node, make(map[int]bool), maps)
-	buildNeighbourNodes(node, make(map[int]bool), maps)
+	cloneNodes(node, make(map[int]bool), maps)
+	buildCloneNodeNeighbours(node, make(map[int]bool), maps)
 	
 	return maps[node.Val][1]
 }
 
-func buildNodes(node *Node, visited map[int]bool, maps map[int][]*Node) {
+func cloneNodes(node *Node, visited map[int]bool, maps map[int][]*Node) {
 	visited[node.Val] = true
 
 	copyNode := Node{
@@ -33,12 +33,12 @@ func buildNodes(node *Node, visited map[int]bool, maps map[int][]*Node) {
 	for _, p := range node.Neighbors {
 		_, exist := visited[p.Val]
 		if !exist {
-			buildNodes(p, visited, maps)
+			cloneNodes(p, visited, maps)
 		}
 	}
 }
 
-func buildNeighbourNodes(node *Node, visited map[int]bool, maps map[int][]*Node){
+func buildCloneNodeNeighbours(node *Node, visited map[int]bool, maps map[int][]*Node){
 	visited[node.Val] = true
 
 	copiedNodePointer := maps[node.Val][1];
@@ -47,7 +47,7 @@ func buildNeighbourNodes(node *Node, visited map[int]bool, maps map[int][]*Node)
 		
 		_, exist := visited[p.Val]
 		if !exist {
-			buildNeighbourNodes(p, visited, maps)
+			buildCloneNodeNeighbours(p, visited, maps)
 		}
 	}
 }
