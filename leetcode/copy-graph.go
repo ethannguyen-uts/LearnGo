@@ -10,44 +10,39 @@ type Node struct {
  }
 
 func cloneGraph(node *Node) *Node {
-	if node == nil {
-		return nil
-	}
+    if node == nil {
+        return nil
+    }
 
-	maps := make(map[int][]*Node)
-	cloneNodes(node, make(map[int]bool), maps)
-	buildCloneNodeNeighbours(node, make(map[int]bool), maps)
-	
-	return maps[node.Val][1]
+    nodeMapping := make(map[int][]*Node)
+    createClones(node, make(map[int]bool), nodeMapping)
+    attachNeighbors(node, make(map[int]bool), nodeMapping)
+
+    return nodeMapping[node.Val][1]
 }
 
-func cloneNodes(node *Node, visited map[int]bool, maps map[int][]*Node) {
-	visited[node.Val] = true
+func createClones(node *Node, visited map[int]bool, nodeMapping map[int][]*Node) {
+    visited[node.Val] = true
 
-	copyNode := Node{
-		Val: node.Val, Neighbors: nil,
-	}
+    clonedNode := &Node{Val: node.Val}
+    nodeMapping[node.Val] = []*Node{node, clonedNode}
 
-	maps[node.Val] = []*Node{node, &copyNode}
-
-	for _, p := range node.Neighbors {
-		_, exist := visited[p.Val]
-		if !exist {
-			cloneNodes(p, visited, maps)
-		}
-	}
+    for _, neighbor := range node.Neighbors {
+        if !visited[neighbor.Val] {
+            createClones(neighbor, visited, nodeMapping)
+        }
+    }
 }
 
-func buildCloneNodeNeighbours(node *Node, visited map[int]bool, maps map[int][]*Node){
-	visited[node.Val] = true
+func attachNeighbors(node *Node, visited map[int]bool, nodeMapping map[int][]*Node){
+    visited[node.Val] = true
 
-	copiedNodePointer := maps[node.Val][1];
-	for _, p := range node.Neighbors {
-		copiedNodePointer.Neighbors = append(copiedNodePointer.Neighbors, maps[p.Val][1])
-		
-		_, exist := visited[p.Val]
-		if !exist {
-			buildCloneNodeNeighbours(p, visited, maps)
-		}
-	}
+    clonedNode := nodeMapping[node.Val][1]
+    for _, neighbor := range node.Neighbors {
+        clonedNode.Neighbors = append(clonedNode.Neighbors, nodeMapping[neighbor.Val][1])
+
+        if !visited[neighbor.Val] {
+            attachNeighbors(neighbor, visited, nodeMapping)
+        }
+    }
 }
