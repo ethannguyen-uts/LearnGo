@@ -2,29 +2,30 @@ package main
 
 func graph_valid_tree(n int, edges [][]int) bool {
 	if (len(edges) == 0) {
-		return true
+		return n == 1
 	}
 
-	adjacentList := getAdjecentList(edges)
+	adjacentList := getAdjacentList(edges)
 	firstEdge := edges[0][0];
-	visited := map[int]bool{}
+	visited := make(map[int]bool, n)
 
-	var hasCircle = hasCircle(firstEdge, -1, adjacentList, visited)
-	if (hasCircle) {
+	var hasCycle = hasCycle(firstEdge, -1, adjacentList, visited)
+	if (hasCycle) {
 		return false
 	}
 
 	return len(visited) == n
 }
 
-func hasCircle(edge int, prev int, adjacentList map[int][]int, visited map[int]bool) bool {	
+func hasCycle(edge int, prev int, adjacentList map[int][]int, visited map[int]bool) bool {	
 	adjacents := adjacentList[edge]
     visited[edge] = true
 	for _, adjacentVertex := range adjacents {
 		_, exist := visited[adjacentVertex] 
 		if (exist && adjacentVertex != prev) {
 				return true
-		} else if (!exist && hasCircle(adjacentVertex, edge, adjacentList, visited)) {
+		} 
+        if (!exist && hasCycle(adjacentVertex, edge, adjacentList, visited)) {
 				return true	
 		}
 	}
@@ -32,7 +33,7 @@ func hasCircle(edge int, prev int, adjacentList map[int][]int, visited map[int]b
 	return false 
 }
 
-func getAdjecentList(edges [][]int) map[int][]int {
+func getAdjacentList(edges [][]int) map[int][]int {
 	r := make(map[int][]int)
 
 	for _, edge := range edges {

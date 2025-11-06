@@ -14,7 +14,7 @@ func createAdjecentList(edges [][]int) map[int][]int {
 	return r
 }
 
-func cCreateAdjacentListMain() {
+func test() {
 	edges := [][]int{
 		{0, 1},
 		{1, 2},
