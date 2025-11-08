@@ -1,5 +1,3 @@
-
-
 import "strconv"
 
 func numIslands(grid [][]byte) int {
